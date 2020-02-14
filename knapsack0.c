@@ -12,33 +12,47 @@
 #define _GNU_SOURCE
 #include <stdlib.h>
 
+#define max(a,b) \
+ ({ __typeof__ (a) _a = (a); \
+     __typeof__ (b) _b = (b); \
+   _a > _b ? _a : _b; })
+
 typedef struct {
-  int value, weight;
+  unsigned value, weight;
 } Item;
 
+unsigned knapsack(unsigned c, unsigned n, Item items[]) {
+  unsigned map[n+1][c];
+  unsigned i, w;
+  for (i = 0; i < c; i++)
+    map[0][i] = 0;
+  for (i = 1; i < n+1; i++) {
+    Item cur = items[i-1];
+    for (w = 0; w < c; w++) {
+      if (cur.weight > w)
+	map[i][w] = map[i-1][w];
+      else
+	map[i][w] = max(map[i-1][w],
+			map[i-1][(w+1)-cur.weight]+cur.value);
+    }
+  }
+
+  return map[n][c-1];
+}
 
 int main(int argc, char *argv[]) {
-  size_t buf_size = 4096;
-  char *tmp, *buf = calloc(buf_size, sizeof(char));
-  unsigned capacity, n;
+  if (argc < 2)
+    exit(2);
+  unsigned c, n;
   FILE* f = fopen(argv[1], "r");
+
   // reading input file
-  for (unsigned i = 0;
-       fread(buf+(buf_size*i), 1, 4096, f) == buf_size;
-       ++i) {
-    reallocarray(buf, buf_size*i+2, sizeof(char));
-  }
-
-  char *line = strtok_r(buf, "\n", &tmp);
-  sprintf(line, "%u,%u", capacity, n);
+  fscanf(f, "%u,%u\n", &c, &n);
   Item items[n];
-  for (int i = 0; i < n; ++i) {
-    line = strtok_r(NULL, '\n', &tmp);
-    char *tok;
-    items[i].value  = atoi(strtok_r(line, ',', &tok));
-    items[i].weight = atoi(strtok_r(NULL, ',', &tok));
-  }
+  for (int i = 0;
+       fscanf(f, "%u,%u\n", &items[i].value, &items[i].weight) > 0;
+       ++i);
 
-  for (int i = 0; i < n; ++i)
-    printf("%u,%u", items[i].value, items[i].weight);
+  printf("%u\n", knapsack(c, n, items));
+
 }
