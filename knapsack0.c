@@ -22,18 +22,18 @@ typedef struct {
 } Item;
 
 unsigned knapsack(unsigned c, unsigned n, Item items[]) {
-  unsigned map[n+1][c];
+  unsigned (*map)[c+1] = malloc(sizeof(unsigned[n+1][c+1]));
   unsigned i, w;
-  for (i = 0; i < c; i++)
+  for (i = 0; i <= c; i++)
     map[0][i] = 0;
   for (i = 1; i < n+1; i++) {
     Item cur = items[i-1];
-    for (w = 0; w < c; w++) {
+    for (w = 0; w <= c; w++) {
       if (cur.weight > w)
 	map[i][w] = map[i-1][w];
       else
 	map[i][w] = max(map[i-1][w],
-			map[i-1][(w+1)-cur.weight]+cur.value);
+			map[i-1][w-cur.weight]+cur.value);
     }
   }
 
