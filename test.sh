@@ -9,7 +9,7 @@ for f in data/input.*; do
   if [[ "$output" != "$expected" ]]; then
     echo "Test $n failed (output differs):"
     echo ----------------- Output ---------------
-    echo $ouptut | cat -v
+    echo $output | cat -v
     echo ----------------- Expected -------------
     echo $expected | cat -v
     echo ----------------------------------------
