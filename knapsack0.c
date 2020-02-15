@@ -37,7 +37,18 @@ unsigned knapsack(unsigned c, unsigned n, Item items[]) {
     }
   }
 
-  return map[n][c-1];
+#ifdef DEBUG
+  for (w = 0; w <= c; w++)
+    printf("%3d ", w);
+  printf("\n");
+  for (i = 0; i < n+1; i++) {
+    for (w = 0; w <= c; w++) {
+      printf("%3d ", map[i][w]);
+    }
+    printf("\n");
+  }
+#endif
+  return map[n][c];
 }
 
 int main(int argc, char *argv[]) {
