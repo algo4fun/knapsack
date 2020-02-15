@@ -16,5 +16,3 @@ for f in data/input.*; do
   fi
   /usr/bin/time --format "%C: %E" ./$prog $f > /dev/null
 done
-
-echo All tests passed!
