@@ -67,11 +67,23 @@ unsigned s_pop(Stack *s) {
   return *(s->top);
 }
 
+void s_sort(Stack *s, Item items[]) {
+  for (unsigned i = 0; i < s->size; ++i)
+    for (unsigned j = i+1; j < s->size; ++j)
+      if (items[s->bottom[j]].weight > items[s->bottom[i]].weight) {
+	unsigned tmp = s->bottom[i];
+	s->bottom[i] = s->bottom[j];
+	s->bottom[j] = tmp;
+      }
+}
+
 void s_print(Stack *s, Item items[]) {
+#ifdef DEBUG
   for (unsigned i = 0; i < s->size; ++i) {
     Item item = items[s->bottom[i]];
     printf("%3u: %3u %3u %3f\n", i, item.value, item.weight, ratio(item));
   }
+#endif
 }
 
 unsigned knapsack(unsigned c, unsigned n, Item items[]) {
@@ -84,9 +96,11 @@ unsigned knapsack(unsigned c, unsigned n, Item items[]) {
   unsigned i;
 
   sort(items, n);
+#ifdef DEBUG
   for (i = 0; i < n; ++i) {
     printf("%7u, %7u, %7f\n", items[i].value, items[i].weight, ratio(items[i]));
   }
+#endif
 
   Stack s = s_init(n);
   bool in_bag[n];
@@ -101,6 +115,7 @@ unsigned knapsack(unsigned c, unsigned n, Item items[]) {
       in_bag[i] = true;
     }
   }
+  s_sort(&s, items);
 
   while (true) {
     s_print(&s, items);
@@ -118,7 +133,7 @@ unsigned knapsack(unsigned c, unsigned n, Item items[]) {
 	++items_to_pop;
       }
       // If the current item has a better ratio then swap
-      if (ratio(sum) < ratio(items[i])) {
+      if (sum.value < items[i].value) {
 	for (unsigned j = 0; j < items_to_pop; ++j) {
 	  unsigned item = s_pop(&s);
 	  in_bag[item] = false;
@@ -127,6 +142,7 @@ unsigned knapsack(unsigned c, unsigned n, Item items[]) {
 	s_push(&s, i);
 	in_bag[i] = true;
 	c -= items[i].weight;
+	s_sort(&s, items);
 	continue;
       }
     }
